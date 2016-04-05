@@ -15,8 +15,9 @@ function getInit() {
 
 function init(param) {
     if (param) {
+        var directory = __dirname + '/' + param;
         try {
-            init_dir = req(param, {
+            init_dir = req(directory, {
                 recurse: true
             });
         } catch (err) {
