@@ -55,6 +55,30 @@ myfileC.run();
 
 Output: 'Hi'
 
+# API
+### init *required
+Initialize module and process directory.
+
+```
+var req = require('imported');
+req.init('subDirectoryA');
+
+```
+
+### get
+Primary method used to import a module
+
+```
+var myfileC = req.get('myfileC');
+```
+
+### getInit
+Will return the entire module directory
+
+```
+var directoryStructure = req.getInit();
+```
+
 # Features
 - Returns null when a module name is given that does not exist
 
