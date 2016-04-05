@@ -14,6 +14,7 @@ npm install imported
 # Usage
 Assuming your directory structure looks as follows:
 
+```
 mainProjectDir
     |
     |
@@ -28,6 +29,7 @@ mainProjectDir
             |
             |
             -> myfileC.js
+```
 
 myfileC.js
 ```
