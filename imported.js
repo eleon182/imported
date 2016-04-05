@@ -55,8 +55,25 @@ function get(param) {
 function getNamespace(name) {
     var response;
     var count = 0;
+
+    absolute_paths.forEach(function(val){
+        if(val.indexOf(name) >= 0){
+            response = val;
+            count ++;
+        }
+    });
+
+    if(count === 1){
+        return response;
+    }
+    else if(count > 1){
+        throw buildError('Namespace collision!', name);
+    }
+
+    response = null;
+    count = 0;
     absolute_paths.forEach(function(val) {
-        if (determineMatch(name, val)) {
+        if (fuzzyMatch(name, val)) {
             count++;
             response = val;
         }
@@ -67,7 +84,7 @@ function getNamespace(name) {
     return response;
 }
 
-function determineMatch(name, path) {
+function fuzzyMatch(name, path) {
     var split = lo.split(name, '.');
     var response = true;
     split.forEach(function(val) {
