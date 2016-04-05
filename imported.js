@@ -1,5 +1,7 @@
 var req = require('require-dir');
 var lo = require('lodash');
+var FS = require('fs');
+var Path = require('path');
 
 module.exports = {
     init: init,
@@ -14,9 +16,13 @@ function getInit() {
 }
 
 function init(param) {
+    var parent = module.parent;
+    var parentFile = parent.filename;
+    var parentDir = Path.dirname(parentFile);
+
     if (param) {
-        var directory = __dirname + '/' + param;
         try {
+            var directory = Path.resolve(parentDir, param);
             init_dir = req(directory, {
                 recurse: true
             });
