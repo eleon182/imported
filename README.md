@@ -54,7 +54,9 @@ req.init('subDirectoryA');
 var myfileC = req.get('myfileC');
 var myfileA = req.get('myfileA'); // throws error due to namespace collision
 var myfileA = req.get('subDirectoryB.myfileA'); // OK
-var myfileA = req.get('subDirectoryA.myfileA'); // OK
+var subDirA = req.get('subDirectoryA'); // OK
+var subDirB = req.get('subDirectoryA.subDirectoryB'); // OK
+var subDirB = req.get('subDirectoryB'); // OK
 
 myfileC.run();
 ```
@@ -88,6 +90,7 @@ var directoryStructure = req.getInit();
 ```
 
 # Features
+- Require file or entire directory as dependencies
 - Returns null when a module name is given that does not exist
 - Namespacing (Absolulte and relative)
 - Collision detection
