@@ -20,71 +20,66 @@ function getInit() {
 
 function init(param) {
     if (param) {
-        try {
-            var parent = module.parent;
-            var parentFile = parent.filename;
-            var parentDir = Path.dirname(parentFile);
-            directory = Path.resolve(parentDir, param);
+        var parent = module.parent;
+        var parentFile = parent.filename;
+        var parentDir = Path.dirname(parentFile);
+        directory = Path.resolve(parentDir, param);
 
-            init_dir = req(directory, {
-                recurse: true
-            });
+        init_dir = req(directory, {
+            recurse: true
+        });
 
-            initializeAbsolutePaths(init_dir);
-        } catch (err) {
-            throw buildError('Directory does not exist!', err);
-        }
+        initializeAbsolutePaths(init_dir);
     }
 }
 
-function get(param) {
-    var absolute = lo.get(init_dir, param);
-    var namespace;
-    if (absolute) {
-        return absolute;
+function get(name) {
+    if (!name) {
+        return init_dir;
     } else {
-        namespace = getNamespace(param);
-        if (namespace) {
-            return lo.get(init_dir, namespace);
-        } else {
-            return get_recurse(init_dir, param);
-        }
+        return lo.get(init_dir, name) || lo.get(init_dir, matchExactly(name)) || lo.get(init_dir, matchFuzzy(name)) || get_recurse(init_dir, name);
     }
 }
 
-function getNamespace(name) {
+function matchExactly(name) {
     var response;
     var count = 0;
 
-    absolute_paths.forEach(function(val){
-        if(val.indexOf(name) >= 0){
+    absolute_paths.forEach(function(val) {
+        if (val.indexOf(name) >= 0) {
             response = val;
-            count ++;
+            count++;
         }
     });
 
-    if(count === 1){
+    if (count === 1) {
         return response;
-    }
-    else if(count > 1){
+    } else if (count > 1) {
         throw buildError('Namespace collision!', name);
     }
 
-    response = null;
-    count = 0;
+    return response;
+}
+
+function matchFuzzy(name) {
+    var response;
+    var count = 0;
+
     absolute_paths.forEach(function(val) {
-        if (fuzzyMatch(name, val)) {
+        if (isFuzzyMatch(name, val)) {
             count++;
             response = val;
         }
     });
+
     if (count > 1) {
         throw buildError('Namespace collision!', name);
     }
+
     return response;
 }
 
-function fuzzyMatch(name, path) {
+function isFuzzyMatch(name, path) {
     var split = lo.split(name, '.');
     var response = true;
     split.forEach(function(val) {
@@ -98,8 +93,7 @@ function fuzzyMatch(name, path) {
 function initializeAbsolutePaths(raw_paths) {
     var options = {
         listeners: {
-            names: function(root, nodeNamesArray) {
-            },
+            names: function(root, nodeNamesArray) {},
             directories: function(root, dirStatsArray, next) {
                 next();
             },
