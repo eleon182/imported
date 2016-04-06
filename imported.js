@@ -1,4 +1,5 @@
 var req = require('require-dir');
+var debug = require('debug')('dev');
 var lo = require('lodash');
 var FS = require('fs');
 var Path = require('path');
@@ -12,6 +13,7 @@ module.exports = {
 
 var init_dir = null;
 var absolute_paths = [];
+var absolute_dir = [];
 var directory;
 
 function getInit() {
@@ -28,6 +30,8 @@ function init(param) {
         init_dir = req(directory, {
             recurse: true
         });
+        debug('init done', directory);
+        debug('structure: ', init_dir);
 
         initializeAbsolutePaths(init_dir);
     }
@@ -42,52 +46,92 @@ function get(name) {
 }
 
 function matchExactly(name) {
+    debug('exact start');
+    var list = [];
+    var dirList = [];
     var response;
-    var count = 0;
 
-    absolute_paths.forEach(function(val) {
-        if (val.indexOf(name) >= 0) {
-            response = val;
-            count++;
+    debug('abs dir', absolute_dir);
+
+    absolute_dir.forEach(function(val) {
+        if (isExactMatch(name, val)) {
+            debug('exact dir found: ', val);
+            dirList.push(val);
         }
     });
 
-    if (count === 1) {
-        return response;
-    } else if (count > 1) {
-        throw buildError('Namespace collision!', name);
+    absolute_paths.forEach(function(val) {
+        if (isExactMatch(name, val)) {
+            debug('exact file found: ', val);
+            list.push(val);
+        }
+    });
+
+    if (dirList.length >= 1) {
+        response = lo.head(dirList);
+    } else if (list.length === 1) {
+        response = lo.head(list);
+    } else if (list.length !== 0 && dirList !== 0) {
+        debug('exact list collision: ', list);
+        throw 'Namespace collision: ' + lo.toString(list) + '  ' + lo.toString(dirList);
     }
 
     return response;
 }
 
-function matchFuzzy(name) {
-    var response;
-    var count = 0;
+function isExactMatch(name, path) {
+    var pathSplit = lo.split(path, '.');
+    var nameSplit = lo.split(name, '.');
 
-    absolute_paths.forEach(function(val) {
+    var first = lo.indexOf(pathSplit, lo.head(nameSplit));
+    var last = lo.indexOf(pathSplit, lo.last(nameSplit));
+
+    var subArray = lo.slice(pathSplit, first, last + 1);
+
+    return lo.isEqual(subArray, nameSplit);
+}
+
+function matchFuzzy(name) {
+    debug('fuzzy start');
+    var list = [];
+    var dirList = [];
+    var response;
+
+    debug('abs dir', absolute_dir);
+
+    absolute_dir.forEach(function(val) {
         if (isFuzzyMatch(name, val)) {
-            count++;
-            response = val;
+            debug('fuzzy found: ', val);
+            dirList.push(val);
         }
     });
 
-    if (count > 1) {
-        throw buildError('Namespace collision!', name);
+    absolute_paths.forEach(function(val) {
+        if (isFuzzyMatch(name, val)) {
+            debug('exact found: ', val);
+            list.push(val);
+        }
+    });
+
+    if (dirList.length >= 1) {
+        response = lo.head(dirList);
+    } else if (list.length === 1) {
+        response = lo.head(list);
+    } else if (list.length !== 0 && dirList !== 0) {
+        debug('fuzzy list collision: ', list);
+        throw 'Namespace collision: ' + lo.toString(list) + '  ' + lo.toString(dirList);
     }
 
     return response;
 }
 
 function isFuzzyMatch(name, path) {
-    var split = lo.split(name, '.');
-    var response = true;
-    split.forEach(function(val) {
-        if (path.indexOf(val) < 0) {
-            response = false;
-        }
-    });
-    return response;
+    var pathSplit = lo.split(path, '.');
+    var nameSplit = lo.split(name, '.');
+
+    var intersection = lo.intersection(pathSplit, nameSplit);
+
+    return intersection.length === nameSplit.length;
 }
 
 function initializeAbsolutePaths(raw_paths) {
@@ -95,6 +139,9 @@ function initializeAbsolutePaths(raw_paths) {
         listeners: {
             names: function(root, nodeNamesArray) {},
             directories: function(root, dirStatsArray, next) {
+                lo.map(dirStatsArray, function(val) {
+                    absolute_dir.push(root + '/' + val.name);
+                });
                 next();
             },
             file: function(root, fileStats, next) {
@@ -106,6 +153,7 @@ function initializeAbsolutePaths(raw_paths) {
     walk.walkSync(directory, options);
 
     absolute_paths = formatPaths(absolute_paths);
+    absolute_dir = formatPaths(absolute_dir);
 }
 
 function stripExtension(fileName) {
@@ -119,6 +167,7 @@ function formatPaths(paths) {
     var output = [];
     var temp = [];
 
+    //debug('format paths: ', paths);
     paths.forEach(function(val) {
         temp.push(lo.replace(val, directory + '/', ''));
     });
@@ -131,14 +180,15 @@ function formatPaths(paths) {
 }
 
 function get_recurse(param, obj) {
-    if (param && lo.isObject(param) && lo.has(param, obj)) {
-        return lo.get(param, obj);
-    } else {
-        if (lo.isObject(param)) {
+    if (lo.isObject(param)) {
+        if (lo.has(param, obj)) {
+            return lo.get(param, obj);
+        } else {
             for (var key in param) {
                 if (lo.isObject(param[key])) {
                     var temp = get_recurse(param[key], obj);
                     if (temp) {
+                        debug('recurse found: ', temp);
                         return temp;
                     }
                 }
