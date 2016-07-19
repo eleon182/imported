@@ -5,6 +5,7 @@ var helper = require('./helper');
 
 var req_list = null;
 var dir_list = null;
+var object_list = {};
 
 module.exports = {
     init: init,
@@ -13,6 +14,7 @@ module.exports = {
 
 function init(param) {
     initializeDirectoryList(helper.getDirectoryList(param));
+    helper.initializeObjectList(dir_list, object_list);
     var parent = module.parent;
     var parentFile = parent.filename;
     var parentDir = path.dirname(parentFile);
@@ -21,14 +23,12 @@ function init(param) {
     req_list = req(directory, {
         recurse: true
     });
+    helper.loadObjects(object_list, req_list, dir_list);
 }
 
 function get(param) {
-    if(!req_list || ! dir_list){
-        throw 'Must allow imported to finish obtaining all dependencies before using any of them';
-    }
-    if (dir_list[param]) {
-        return lo.get(req_list, dir_list[param]);
+    if (object_list[param]) {
+        return object_list[param];
     } else {
         throw 'Dependency not found: ' + param;
     }

@@ -2,12 +2,26 @@ var lo = require('lodash');
 var fs = require('fs');
 
 module.exports = {
+    initializeObjectList: initializeObjectList,
+    loadObjects: loadObjects,
     extractScripts: extractScripts,
     getFileName: getFileName,
     extractObjectPath: extractObjectPath,
     validateFileList: validateFileList,
     getDirectoryList: getDirectoryList
 };
+
+function loadObjects(object_list, req_list, dir_list){
+    for(var key in dir_list){
+        object_list[key] = lo.get(req_list, dir_list[key]);
+    }
+}
+
+function initializeObjectList(dir_list, object_list){
+    for(var key in dir_list){
+        object_list[key] = {};
+    }
+}
 
 function getDirectoryList(dir) {
     var results = []
