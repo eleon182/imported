@@ -1,12 +1,14 @@
 # imported
-Node.JS global require helper
+Node.JS global require
 
 # Summary
 This module will help clean your module dependencies by eliminating the need to require every single module in your project using relative paths.
 
 With 'imported', you simply initialize it with a project directory name, and imported will scan your project and load every module for you. Then you simply have to request any module in your project by its name without any paths.
 
-If there is a naming conflict, you simply have to specify some of the path to resolve it. Just make sure to give it parts of the path that makes it unique enough, and imported will find it.
+# Update
+With version 2.x, I have removed fuzzy matching to simplify the algorithm. Now, you must ensure your project has no file name collisions.
+This will make it easier for you to get any dependency in your project by using the file name only.
 
 # Installation
 ```
@@ -31,7 +33,6 @@ mainProjectDir
             |
             |
             -> myfileC.js
-            -> myfileA.js
 ```
 
 myfileC.js
@@ -52,19 +53,25 @@ var req = require('imported');
 req.init('subDirectoryA');
 
 var myfileC = req.get('myfileC');
-var myfileA = req.get('myfileA'); // throws error due to namespace collision
-var myfileA = req.get('subDirectoryB.myfileA'); // OK
-var subDirA = req.get('subDirectoryA'); // OK
-var subDirB = req.get('subDirectoryA.subDirectoryB'); // OK
-var subDirB = req.get('subDirectoryB'); // OK
+var myfileA = req.get('myfileA');
+var myfileB= req.get('myFileB');
 
 myfileC.run();
 ```
 
 Output: 'Hi'
 
+myFileB.js
+```
+var imported = require('imported');
+var myFileC = imported.get('myFileC'); // import any module from any other module
+
+myFileC.run();
+```
+Output: 'Hi'
+
 # API
-### init *required
+### init *required*
 Initialize module and process directory.
 
 ```
@@ -78,24 +85,16 @@ Primary method used to import a module
 
 ```
 var myfileC = req.get('myfileC');
-var myfileA = req.get('subDirectoryB.myfileA'); // OK
-var myfileA = req.get('subDirectoryA.subDirectoryB.myfileA'); // OK
-```
-
-### getInit
-Will return the entire module directory
-
-```
-var directoryStructure = req.getInit();
+var myfileA = req.get('myfileA');
 ```
 
 # Features
-- Require file or entire directory as dependencies
-- Returns null when a module name is given that does not exist
-- Namespacing (Absolulte and relative)
+- Require any module in your entire project using the file's name
+- Will recusively search your project for the module you are requesting
+- Throws an error when 'requiring' a dependency that does not exist
+- Throws an error when a naming collision is detected
 - Collision detection
-- Allows lowest common denominator name spacing. You only have to specific enough of the name space to make the module you need unique.
-- When using relative name spacing, imported will make its best attempt to find the correct module you need using as little information as possible from user.
+- Unit testing coverage on all interfaces for helper functions
 
 # Future
-- Submit requests!
+- Easy dependency override for unit testing mocking

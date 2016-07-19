@@ -11,7 +11,6 @@
   "scripts": {},
   "dependencies": {
     "lodash": "^4.8.2",
-    "require-dir": "^0.3.0",
-    "walk": "^2.3.9"
+    "require-dir": "^0.3.0"
   }
 }
