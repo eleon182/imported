@@ -63,10 +63,13 @@ Output: 'Hi'
 
 myFileB.js
 ```
-var imported = require('imported');
-var myFileC = imported.get('myFileC'); // import any module from any other module
+var imp = require('imported');
 
-myFileC.run();
+function runme(){
+    var myFileC = imp.get('myFileC'); // import any module from any other module
+
+    myFileC.run();
+}
 ```
 Output: 'Hi'
 
@@ -95,6 +98,10 @@ var myfileA = req.get('myfileA');
 - Throws an error when a naming collision is detected
 - Collision detection
 - Unit testing coverage on all interfaces for helper functions
+
+# Notes
+- Make sure you are not using the get function on a module during loading. Use the get function on demand when you need the dependency.
+- Make sure the first thing you do is run the 'init' function. This will load all the modules into the imported library
 
 # Future
 - Easy dependency override for unit testing mocking
