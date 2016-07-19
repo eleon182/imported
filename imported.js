@@ -1,4 +1,5 @@
 var req = require('require-dir');
+var path = require('path');
 var lo = require('lodash');
 var helper = require('./helper');
 
@@ -12,15 +13,17 @@ module.exports = {
 
 function init(param) {
     initializeDirectoryList(helper.getDirectoryList(param));
-    req_list = req(param, {
+    var parent = module.parent;
+    var parentFile = parent.filename;
+    var parentDir = path.dirname(parentFile);
+    directory = path.resolve(parentDir, param);
+
+    req_list = req(directory, {
         recurse: true
     });
 }
 
 function get(param) {
-    if(!dir_list){
-        throw 'Imported initialization not run yet!';
-    }
     if (dir_list && dir_list[param]) {
         return lo.get(req_list, dir_list[param]);
     } else {
