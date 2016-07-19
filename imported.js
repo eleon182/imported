@@ -24,7 +24,10 @@ function init(param) {
 }
 
 function get(param) {
-    if (dir_list && dir_list[param]) {
+    if(!req_list || ! dir_list){
+        throw 'Must allow imported to finish obtaining all dependencies before using any of them';
+    }
+    if (dir_list[param]) {
         return lo.get(req_list, dir_list[param]);
     } else {
         throw 'Dependency not found: ' + param;
