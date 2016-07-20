@@ -82,6 +82,10 @@ var req = require('imported').init('subDirectoryA');
 var req = require('imported').init('subDirectoryA', {exclude: /(\.git|\.svn|node_modules|test)/ }); // Exclude option will not import those directories. Use Regex.
 var req = require('imported').init(); // Optional parameter. Defaults to current directory.
 ```
+Default exclusion directories:
+```
+/(\.git|\.svn|node_modules)/
+```
 
 ### get
 Primary method used to import a module

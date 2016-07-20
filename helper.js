@@ -19,11 +19,8 @@ function manualRequire(dir_list, file, path) {
 }
 
 function constructDirectoryList(list, options) {
-    var exclude = lo.get(options, 'exclude');
-    var mainList = list;
-    if (exclude) {
-        mainList = processExcludes(list, exclude);
-    }
+    var exclude = lo.get(options, 'exclude') || /(\.git|\.svn|node_modules)/;
+    var mainList = processExcludes(list, exclude);
     mainList = extractScripts(mainList);
     var fileList = [];
     var currentFile;
