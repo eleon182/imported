@@ -20,7 +20,7 @@ function manualRequire(dir_list, file, path) {
 
 function constructDirectoryList(list, options) {
     var exclude = lo.get(options, 'exclude');
-    var mainList;
+    var mainList = list;
     if (exclude) {
         mainList = processExcludes(list, exclude);
     }
