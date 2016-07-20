@@ -25,7 +25,7 @@ function init(param, options) {
     var parentDir = path.dirname(parentFile);
     directory = path.resolve(parentDir, param);
 
-    var req_list = req(param, {
+    var req_list = req(directory, {
         recursive: true,
         excludeDirs: lo.get(options, 'exclude')
     });
