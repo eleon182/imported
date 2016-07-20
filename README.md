@@ -48,13 +48,11 @@ function run(){
 
 start.js
 ```
-var req = require('imported');
+var req = require('imported').init('subDirectoryA');
 
-req.init('subDirectoryA');
-
-var myfileC = req.get('myfileC');
-var myfileA = req.get('myfileA');
-var myfileB= req.get('myFileB');
+var myfileC = req.myfileC;
+var myfileA = req.myfileA;
+var myfileB= req.myFileB;
 
 myfileC.run();
 ```
@@ -63,10 +61,10 @@ Output: 'Hi'
 
 myFileB.js
 ```
-var imp = require('imported');
+var dep = require('imported');
 
-function runme(){
-    var myFileC = imp.get('myFileC'); // import any module from any other module
+function runme() {
+    var myFileC = dep.myFileC; // import any module from any other module
 
     myFileC.run();
 }
@@ -78,17 +76,16 @@ Output: 'Hi'
 Initialize module and process directory.
 
 ```
-var req = require('imported');
-req.init('subDirectoryA');
-
+var req = require('imported').init('subDirectoryA');
 ```
 
 ### get
 Primary method used to import a module
 
 ```
-var myfileC = req.get('myfileC');
-var myfileA = req.get('myfileA');
+var req = require('imported');
+var myfileC = req.myfileC;
+var myfileA = req.get('myfileA'); // Optional get function instead
 ```
 
 # Features

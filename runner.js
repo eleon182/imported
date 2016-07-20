@@ -1,9 +1,7 @@
-var req = require('./imported');
+var req = require('./imported').init('subDirectoryA');
 
-req.init('subDirectoryA');
-
-var myfileC = req.get('myFileC');
-var myfileA = req.get('myFileA');
-var myfileB= req.get('myFileB');
+var myfileC = req.myFileC;
+var myfileA = req.myFileA;
+var myfileB= req.myFileB;
 
 myfileB();

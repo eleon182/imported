@@ -5,12 +5,13 @@ var helper = require('./helper');
 
 var req_list = null;
 var dir_list = null;
-var object_list = {};
 
-module.exports = {
+var object_list = {
     init: init,
     get: get
 };
+
+module.exports = object_list;
 
 function init(param) {
     initializeDirectoryList(helper.getDirectoryList(param));
@@ -24,6 +25,7 @@ function init(param) {
         recurse: true
     });
     helper.loadObjects(object_list, req_list, dir_list);
+    return object_list;
 }
 
 function get(param) {
