@@ -50,9 +50,9 @@ start.js
 ```
 var req = require('imported').init('subDirectoryA');
 
-var myfileC = req.myfileC;
-var myfileA = req.myfileA;
-var myfileB= req.myFileB;
+var myfileC = req.get('myfileC');
+var myfileA = req..get('myfileA');
+var myfileB= req.myFileB; // Optional notation.
 
 myfileC.run();
 ```
@@ -62,9 +62,11 @@ Output: 'Hi'
 myFileB.js
 ```
 var dep = require('imported');
+var myFileC = dep.get('myFileC');
 
 function runme() {
-    var myFileC = dep.myFileC; // import any module from any other module
+    var myFileA = dep.get('myFileA'); // import any module from any other module
+    var myFileB = dep.myFileB; // import any module from any other module
 
     myFileC.run();
 }
@@ -77,20 +79,17 @@ Initialize module and process directory.
 
 ```
 var req = require('imported').init('subDirectoryA');
-var req = require('imported').init(); // Optional parameter. Defaults to current directory
+var req = require('imported').init('subDirectoryA', {exclude: /(\.git|\.svn|node_modules|test)/ }); // Exclude option will not import those directories. Use Regex.
+var req = require('imported').init(); // Optional parameter. Defaults to current directory.
 ```
 
 ### get
 Primary method used to import a module
-**Note: Do not use when your app is loading, otherwise this will return null. Do not get a dependency until after initialization is complete.**
-
 ```
 var req = require('imported');
 
-function run(){
-    var myfileC = req.myfileC;
-    var myfileA = req.get('myfileA'); // Optional get function instead.
-}
+var myfileC = req.myfileC;
+var myfileA = req.get('myfileA'); // Optional get function instead.
 ```
 
 # Features
@@ -100,6 +99,7 @@ function run(){
 - Throws an error when a naming collision is detected
 - Collision detection
 - Unit testing coverage on all interfaces for helper functions
+- Directory exclusion
 
 # Notes
 - Make sure you are not using the get function on a module during loading. Use the get function on demand when you need the dependency.

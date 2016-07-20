@@ -13,6 +13,6 @@
   },
   "dependencies": {
     "lodash": "^4.13.1",
-    "require-dir": "^0.3.0"
+    "require-dir-all": "^0.4.9"
   }
 }

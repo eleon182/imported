@@ -1,6 +1,28 @@
 var assert = require('assert');
 var helper = require('../helper');
 
+describe('processExcludes', function() {
+    it('should return the excluded list', function() {
+        var list = ['./.git/myFileA.js', './myFileA.js'];
+        var exclude = /(\.git|\.svn|node_modules|test)/;
+        var response = helper.processExcludes(list, exclude);
+        assert.equal(response.length, 1);
+    });
+
+});
+
+describe('manualRequire', function() {
+    it('should return the proper require', function() {
+        var dir_list = {
+            myFileA: 'myFileA'
+        }
+        var path = './subDirectoryA';
+        var input = 'myFileA';
+        var response = helper.manualRequire(dir_list, input, path);
+        assert(response);
+    });
+
+});
 describe('extractScripts', function() {
     it('should remove html and css files', function() {
         var input = ['adir/a.js', 'g/b.json', 'bdir/ddir/c.html', 'g'];

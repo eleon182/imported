@@ -1,14 +1,30 @@
 var lo = require('lodash');
+var path = require('path');
 var fs = require('fs');
 
 module.exports = {
     loadObjects: loadObjects,
     getDirectoryList: getDirectoryList,
-    constructDirectoryList: constructDirectoryList
+    manualRequire: manualRequire,
+    constructDirectoryList: constructDirectoryList,
+    extractObjectPath: extractObjectPath,
+    extractScripts: extractScripts,
+    getFileName: getFileName,
+    validateFileList: validateFileList,
+    processExcludes: processExcludes
 };
 
-function constructDirectoryList(list) {
-    var mainList = extractScripts(list);
+function manualRequire(dir_list, file, path) {
+    return require(path + '/' + lo.replace(dir_list[file], /\./g, '/'));
+}
+
+function constructDirectoryList(list, options) {
+    var exclude = lo.get(options, 'exclude');
+    var mainList;
+    if (exclude) {
+        mainList = processExcludes(list, exclude);
+    }
+    mainList = extractScripts(mainList);
     var fileList = [];
     var currentFile;
     var dir_list = {};
@@ -21,19 +37,27 @@ function constructDirectoryList(list) {
     return dir_list;
 }
 
-function loadObjects(object_list, req_list, dir_list){
-    for(var key in dir_list){
+function processExcludes(list, exclude) {
+    var response = lo.filter(list, function(entry){
+        return !exclude.test(entry);
+    });
+    return response;
+}
+
+function loadObjects(object_list, req_list, dir_list) {
+    for (var key in dir_list) {
         object_list[key] = lo.get(req_list, dir_list[key]);
     }
 }
 
-function initializeObjectList(dir_list, object_list){
-    for(var key in dir_list){
+function initializeObjectList(dir_list, object_list) {
+    for (var key in dir_list) {
         object_list[key] = {};
     }
 }
 
 function getDirectoryList(dir) {
+    if (!dir) dir = '.';
     var results = [];
     var list = fs.readdirSync(dir);
     list.forEach(function(file) {
