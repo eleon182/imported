@@ -3,48 +3,36 @@ var path = require('path');
 var lo = require('lodash');
 var helper = require('./helper');
 
-var req_list = null;
-var dir_list = null;
-
-var object_list = {
+var imported_interface = {
     init: init,
     get: get
 };
 
-module.exports = object_list;
+module.exports = imported_interface;
 
 function init(param) {
-    initializeDirectoryList(helper.getDirectoryList(param));
-    helper.initializeObjectList(dir_list, object_list);
+    if (!param) param = '.';
+
+    var dir_list = helper.constructDirectoryList(helper.getDirectoryList(param));
+
     var parent = module.parent;
     var parentFile = parent.filename;
     var parentDir = path.dirname(parentFile);
     directory = path.resolve(parentDir, param);
 
-    req_list = req(directory, {
+    var req_list = req(directory, {
         recurse: true
     });
-    helper.loadObjects(object_list, req_list, dir_list);
-    return object_list;
+
+    helper.loadObjects(imported_interface, req_list, dir_list);
+    return imported_interface;
 }
 
 function get(param) {
-    if (object_list[param]) {
-        return object_list[param];
+    if (imported_interface[param]) {
+        return imported_interface[param];
     } else {
         throw 'Dependency not found: ' + param;
     }
 }
 
-function initializeDirectoryList(list) {
-    var mainList = helper.extractScripts(list);
-    var fileList = [];
-    var currentFile;
-    dir_list = {};
-    mainList.forEach(function(obj) {
-        currentFile = helper.getFileName(obj);
-        fileList.push(currentFile);
-        dir_list[currentFile] = helper.extractObjectPath(obj);
-    });
-    helper.validateFileList(fileList);
-}

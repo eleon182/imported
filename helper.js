@@ -2,14 +2,24 @@ var lo = require('lodash');
 var fs = require('fs');
 
 module.exports = {
-    initializeObjectList: initializeObjectList,
     loadObjects: loadObjects,
-    extractScripts: extractScripts,
-    getFileName: getFileName,
-    extractObjectPath: extractObjectPath,
-    validateFileList: validateFileList,
-    getDirectoryList: getDirectoryList
+    getDirectoryList: getDirectoryList,
+    constructDirectoryList: constructDirectoryList
 };
+
+function constructDirectoryList(list) {
+    var mainList = extractScripts(list);
+    var fileList = [];
+    var currentFile;
+    var dir_list = {};
+    mainList.forEach(function(obj) {
+        currentFile = getFileName(obj);
+        fileList.push(currentFile);
+        dir_list[currentFile] = extractObjectPath(obj);
+    });
+    validateFileList(fileList);
+    return dir_list;
+}
 
 function loadObjects(object_list, req_list, dir_list){
     for(var key in dir_list){
@@ -24,15 +34,15 @@ function initializeObjectList(dir_list, object_list){
 }
 
 function getDirectoryList(dir) {
-    var results = []
-    var list = fs.readdirSync(dir)
+    var results = [];
+    var list = fs.readdirSync(dir);
     list.forEach(function(file) {
-        file = dir + '/' + file
-        var stat = fs.statSync(file)
-        if (stat && stat.isDirectory()) results = results.concat(getDirectoryList(file))
-        else results.push(file)
+        file = dir + '/' + file;
+        var stat = fs.statSync(file);
+        if (stat && stat.isDirectory()) results = results.concat(getDirectoryList(file));
+        else results.push(file);
     })
-    return results
+    return results;
 }
 
 function validateFileList(list) {

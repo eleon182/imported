@@ -77,15 +77,20 @@ Initialize module and process directory.
 
 ```
 var req = require('imported').init('subDirectoryA');
+var req = require('imported').init(); // Optional parameter. Defaults to current directory
 ```
 
 ### get
 Primary method used to import a module
+**Note: Do not use when your app is loading, otherwise this will return null. Do not get a dependency until after initialization is complete.**
 
 ```
 var req = require('imported');
-var myfileC = req.myfileC;
-var myfileA = req.get('myfileA'); // Optional get function instead
+
+function run(){
+    var myfileC = req.myfileC;
+    var myfileA = req.get('myfileA'); // Optional get function instead.
+}
 ```
 
 # Features
