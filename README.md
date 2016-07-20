@@ -51,7 +51,7 @@ start.js
 var req = require('imported').init('subDirectoryA');
 
 var myfileC = req.get('myfileC');
-var myfileA = req..get('myfileA');
+var myfileA = req.get('myfileA');
 var myfileB= req.myFileB; // Optional notation.
 
 myfileC.run();
