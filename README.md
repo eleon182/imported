@@ -105,9 +105,5 @@ var myfileA = req.get('myfileA'); // Optional get function instead.
 - Unit testing coverage on all interfaces for helper functions
 - Directory exclusion
 
-# Notes
-- Make sure you are not using the get function on a module during loading. Use the get function on demand when you need the dependency.
-- Make sure the first thing you do is run the 'init' function. This will load all the modules into the imported library
-
 # Future
 - Easy dependency override for unit testing mocking
