@@ -81,6 +81,32 @@ Initialize module and process directory.
 var req = require('imported').init('subDirectoryA');
 var req = require('imported').init('subDirectoryA', {exclude: /(\.git|\.svn|node_modules|test)/ }); // Exclude option will not import those directories. Use Regex.
 var req = require('imported').init(); // Optional parameter. Defaults to current directory.
+
+```
+
+Pass in an object instead to manually override dependencies. Used for mocking dependencies during unit testing.
+```
+var req = require('imported').init({
+    myFileC: {
+        run: function() {
+            console.log('this is a mock function that overrides dependencies');
+        }
+    }
+});
+```
+
+Optionally, you can also override only specific dependencies using the optional parameter: 'override'
+```
+// Will allow all normal dependencies except override the ones specified by the override parameter
+var req = require('../imported').init('.', {
+    override: {
+        myFileC: {
+            run: function() {
+                console.log('run mock');
+            }
+        }
+    }
+});
 ```
 Default exclusion directories:
 ```

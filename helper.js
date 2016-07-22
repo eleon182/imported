@@ -11,8 +11,15 @@ module.exports = {
     extractScripts: extractScripts,
     getFileName: getFileName,
     validateFileList: validateFileList,
-    processExcludes: processExcludes
+    processExcludes: processExcludes,
+    overrideDependency: overrideDependency
 };
+
+function overrideDependency(param, imported_interface) {
+    for (var key in param) {
+        imported_interface[key] = param[key];
+    }
+}
 
 function manualRequire(dir_list, file, path) {
     return require(path + '/' + lo.replace(dir_list[file], /\./g, '/'));
@@ -35,7 +42,7 @@ function constructDirectoryList(list, options) {
 }
 
 function processExcludes(list, exclude) {
-    var response = lo.filter(list, function(entry){
+    var response = lo.filter(list, function(entry) {
         return !exclude.test(entry);
     });
     return response;
@@ -43,7 +50,8 @@ function processExcludes(list, exclude) {
 
 function loadObjects(object_list, req_list, dir_list) {
     for (var key in dir_list) {
-        object_list[key] = lo.get(req_list, dir_list[key]);
+        if (!object_list[key])
+            object_list[key] = lo.get(req_list, dir_list[key]);
     }
 }
 

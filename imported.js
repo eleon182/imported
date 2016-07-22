@@ -15,6 +15,16 @@ var imported_interface = {
 module.exports = imported_interface;
 
 function init(param, options) {
+    if (lo.isObject(param)) {
+        helper.overrideDependency(param, imported_interface);
+        isInitialized = true;
+        return;
+    }
+    var override = lo.get(options, 'override');
+    if(override){
+        helper.overrideDependency(override, imported_interface);
+    }
+
     if (isInitialized) return imported_interface;
     if (!param) param = '.';
 
